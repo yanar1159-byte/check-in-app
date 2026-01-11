@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Check-In</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; }
+        h1 { color: #006600; text-align: center; }
+        label { display: block; margin-top: 15px; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; }
+        button { margin-top: 20px; padding: 10px; font-size: 16px; }
+        .radio-group { margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <h1>Daily Check-In</h1>
+
+    <label>Instructions: Answer honestly and take your time. Use your phone's Screen Time feature if needed. Answers are based on today except sleep questions.</label>
+
+    <label>Participant Name:</label>
+    <input type="text" id="name">
+
+    <h2>Section 1: Phone Use</h2>
+    <label>1) Total screen time today:</label>
+    <input type="number" id="total_phone">
+
+    <label>2) How many times did you check your phone today?</label>
+    <div class="radio-group">
+        <input type="radio" name="check_phone" value="1">1
+        <input type="radio" name="check_phone" value="2">2
+        <input type="radio" name="check_phone" value="3">3
+        <input type="radio" name="check_phone" value="4">4
+        <input type="radio" name="check_phone" value="5">5
+    </div>
+
+    <label>3) Last phone use before bed:</label>
+    <input type="text" id="last_phone">
+
+    <h2>Section 2: Sleep</h2>
+    <label>4) How many times did you wake up last night?</label>
+    <div class="radio-group">
+        <input type="radio" name="wake_ups" value="0">0
+        <input type="radio" name="wake_ups" value="1">1
+        <input type="radio" name="wake_ups" value="2">2
+        <input type="radio" name="wake_ups" value="3">3
+        <input type="radio" name="wake_ups" value="4">4
+        <input type="radio" name="wake_ups" value="5">5
+    </div>
+
+    <label>5) Hours of sleep last night:</label>
+    <input type="text" id="hours_of_sleep">
+
+    <label>6) How rested did you feel? (1 = very rested, 5 = very tired)</label>
+    <div class="radio-group">
+        <input type="radio" name="rested" value="1">1
+        <input type="radio" name="rested" value="2">2
+        <input type="radio" name="rested" value="3">3
+        <input type="radio" name="rested" value="4">4
+        <input type="radio" name="rested" value="5">5
+    </div>
+
+    <h2>Section 3: Stress</h2>
+    <label>7) Stress level today (1 = not stressed, 5 = very stressed):</label>
+    <div class="radio-group">
+        <input type="radio" name="stress_level" value="1">1
+        <input type="radio" name="stress_level" value="2">2
+        <input type="radio" name="stress_level" value="3">3
+        <input type="radio" name="stress_level" value="4">4
+        <input type="radio" name="stress_level" value="5">5
+    </div>
+
+    <label>8) Feeling overwhelmed today (1 = nothing, 5 = extremely):</label>
+    <div class="radio-group">
+        <input type="radio" name="overwhelmed" value="1">1
+        <input type="radio" name="overwhelmed" value="2">2
+        <input type="radio" name="overwhelmed" value="3">3
+        <input type="radio" name="overwhelmed" value="4">4
+        <input type="radio" name="overwhelmed" value="5">5
+    </div>
+
+    <label>9) Difficulty relaxing today (1 = easy, 5 = very difficult):</label>
+    <div class="radio-group">
+        <input type="radio" name="relax" value="1">1
+        <input type="radio" name="relax" value="2">2
+        <input type="radio" name="relax" value="3">3
+        <input type="radio" name="relax" value="4">4
+        <input type="radio" name="relax" value="5">5
+    </div>
+
+    <label>10) Anything unusual today or last night? (1 = yes, 0 = no):</label>
+    <div class="radio-group">
+        <input type="radio" name="unusual_event" value="Yes">Yes
+        <input type="radio" name="unusual_event" value="No">No
+    </div>
+    <input type="text" id="unusual_text" placeholder="Optional details">
+
+    <button id="submit_btn">Submit</button>
+    <p id="message"></p>
+
+    <script>
+        function getRadioValue(name) {
+            const radios = document.getElementsByName(name);
+            for (let r of radios) if (r.checked) return r.value;
+            return "";
+        }
+
+        document.getElementById("submit_btn").addEventListener("click", function() {
+            const data = {
+                name: document.getElementById("name").value.trim(),
+                total_phone: document.getElementById("total_phone").value.trim(),
+                last_phone: document.getElementById("last_phone").value.trim(),
+                hours_of_sleep: document.getElementById("hours_of_sleep").value.trim(),
+                check_phone: getRadioValue("check_phone"),
+                wake_ups: getRadioValue("wake_ups"),
+                rested: getRadioValue("rested"),
+                stress_level: getRadioValue("stress_level"),
+                overwhelmed: getRadioValue("overwhelmed"),
+                relax: getRadioValue("relax"),
+                unusual_event: getRadioValue("unusual_event"),
+                unusual_text: document.getElementById("unusual_text").value.trim()
+            };
+
+            if (!data.name || !data.total_phone || !data.last_phone || !data.hours_of_sleep ||
+                !data.check_phone || !data.wake_ups || !data.rested || !data.stress_level || !data.overwhelmed || !data.relax || !data.unusual_event) {
+                document.getElementById("message").innerText = "Please fill out all required fields!";
+                return;
+            }
+
+            const today = new Date().toISOString().slice(0,10);
+            const participant_code = data.name[0].toUpperCase();
+            const csv = `Participant,Date,Total Phone,Phone Checks,Last Phone Use,Hours Sleep,Wake Ups,Rested,Stress Level,Overwhelmed,Relax,Unusual Event,Unusual Text\n` +
+                        `${participant_code},${today},${data.total_phone},${data.check_phone},${data.last_phone},${data.hours_of_sleep},${data.wake_ups},${data.rested},${data.stress_level},${data.overwhelmed},${data.relax},${data.unusual_event},${data.unusual_text}`;
+
+            const blob = new Blob([csv], {type: "text/csv"});
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "checkin_data.csv";
+            link.click();
+
+            document.getElementById("message").innerText = "Data saved successfully!";
+
+            // Reset inputs
+            Object.keys(data).forEach(k => {
+                if (["check_phone","wake_ups","rested","stress_level","overwhelmed","relax","unusual_event"].includes(k)) {
+                    document.getElementsByName(k).forEach(r => r.checked = false);
+                } else {
+                    const el = document.getElementById(k);
+                    if (el) el.value = "";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
